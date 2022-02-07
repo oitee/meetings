@@ -1,0 +1,24 @@
+{
+  "name": "meetings",
+  "version": "1.0.0",
+  "description": "A Node.js application that schedules meetings for sepcific users in specific rooms",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oitee/meetings.git"
+  },
+  "author": "Oitihjya",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/oitee/meetings/issues"
+  },
+  "homepage": "https://github.com/oitee/meetings#readme",
+  "type": "module",
+  "dependencies": {
+    "pg": "^8.7.3",
+    "uuid": "^8.3.2"
+  }
+}
