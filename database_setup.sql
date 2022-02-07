@@ -10,12 +10,13 @@ CREATE TABLE entities (
 );
 
 CREATE TABLE bookings (
-    meeting_id UUID PRIMARY KEY,
+    meeting_id UUID,
     entity text REFERENCES entities(name),
     from_ts TIMESTAMP WITH TIME ZONE,
     to_ts TIMESTAMP WITH TIME ZONE, 
     created_at TIMESTAMP WITH TIME ZONE,
-    updated_at TIMESTAMP WITH TIME ZONE
+    updated_at TIMESTAMP WITH TIME ZONE,
+    PRIMARY KEY(meeting_id, entity)
 );
 
 
