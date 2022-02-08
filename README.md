@@ -12,13 +12,15 @@ This project supports the following features:
 
 The system interacts with the user on the Command Line.
 
-## Design Goals
+## Design Goal
 
-There are four key design goals.
+The system only goes from one valid state to another valid state, i.e., there is no inconsistent state of the system even if many users are trying to make simultaneous changes.
 
-_First_, the system should maintain its state in between system-runs. In other words, meetings scheduled during a paritcular system run, should persist during future system-runs. To ensure this, the system uses a relational database management system (PostgreSQL) to maintain its state.
+## Implementation Details
 
-_Second_, the names of users and rooms should be unique. In other words, the system will throw an appropriate error message if an attempt is made to insert a new user (or room) with an existing username.
+_First_, the system should persist its state in between system-runs. In other words, meetings scheduled during a paritcular system run, should persist during future system-runs. To ensure this, the system uses a relational database management system (PostgreSQL) to maintain its state.
+
+_Second_, the names of users and rooms should be unique. In other words, the system will throw an appropriate error message if an attempt is made to insert a new user (or room) with an existing username (this is only for ease of use; otherwise, we would have to use IDs, instead of names, to schedule meetings).
 
 _Third_, the system guarantees that a meeting should be permitted to be scheduled **only if** every participating user and the respective room have no time-slot conflict (explained below). Even if one entity has a conflict, the system will reject the request for setting up the meeting and prompt the user to try again.
 
@@ -26,19 +28,24 @@ _Fourth_, for the purposes of time-slot conflict-resolution, the system treats u
 
 ### Resolving time-slot conflicts
 
-One of the primary goals of the system is that there should not be any time-slot conflict. What constitutes a time-slot conflict? Simply put, it refers to a situation where a single user or room is assigned to more than one meeting at any given point of time. 
+One of the primary goals of the system is that there should not be any time-slot conflict. What constitutes a time-slot conflict? Simply put, it refers to a situation where a single user or room is assigned to more than one meeting at any given point of time. A time-slot is inclusive of the start and end points.
 
 With respect to a meeting for a given time-slot A (with a start-point 's' and an end-point 'e'), there can be five types of time-slot conflicts, as shown below. 
 
 - Case 1: A meeting which started before 's', but is scheduled to complete after the 's' (but before 'e'). 
+  <img src="https://user-images.githubusercontent.com/85887016/152988848-8511d267-124d-4b91-9833-0a3277d0e36f.png" width="30%">
 
 - Case 2: A meeting which started before 's', and is scheduled to complete after 'e'.
+<img src="https://user-images.githubusercontent.com/85887016/152996562-e19c564f-cb32-4a9c-b815-cd2795220b29.png" width="30%">
 
 - Case 3: A meeting which has the same start and end points as time-slot A.
+ <img src="https://user-images.githubusercontent.com/85887016/152996595-c2658851-b00d-491c-a777-c939665b433e.png" width="30%">
 
 - Case 4: A meeting which started and ended between points 's' and 'e'.
+<img src="https://user-images.githubusercontent.com/85887016/152996634-f4a8cf78-7139-480a-b7a5-0a6a6d2b7108.png" width="30%">
 
 - Case 5: A meeting which started after 's' but before 'e'.
+<img src="https://user-images.githubusercontent.com/85887016/152997031-a6f03ac5-0482-4ff5-ac77-09a5e4c7aea2.png" width="30%">
 
 In each of these cases, there is a time-slot conflict, i.e., at least one point where there are two simultaneous meetings.
 
@@ -103,7 +110,7 @@ The above expression can be expressed in SQL as follows:
 
 ```sql
  SELECT entity FROM bookings WHERE 
-    entity=ANY(entity1, entity2... entityN) 
+    entity IN (entity1, entity2... entityN) 
     AND (
             (from_ts <= to_timestamp(start_point) AND to_ts >= to_timestamp(start_point))
             OR
@@ -121,14 +128,14 @@ In an ideal world, we follow a two-step process while creating a new meeting:
 - First, check for conflicts
 - Next, insert the new meeting.
 
-This approach has one downside: if there are more than one systems trying to write the database simultaneously, the database may change its state between step one and step two above. For example, let's say there are two systems attempting to simultaneously schedule the same meeting with the same time-slot and entities. It is possible, that read-write sequence takes place in the following manner:
+This approach has one downside: if there is more than one system trying to write to the database simultaneously, the database may change its state between step one and step two above. For example, let's say there are two systems attempting to simultaneously schedule the same meeting with the same time-slot and entities. It is possible, that read-write sequence interleaves in the following manner:
 
 - System 1 reads the database ... _(realises that there is no conflict)_
 - System 2 reads the database ... _(realises that there is no conflict)_
 - System 1 writes the database ... _(creates the meeting)_
 - System 2 writes the database ... _(creates the same conflicting meeting)_
 
-Thus, we need to take an all-or-nothing approach while reading and writing. In other words, we need to write the database, using ACID transactions. This will ensure (among other guarantees) that if at the time of making a write on the database, if the relevant part of database has progressed further from the last read, the system will exit the transaction to avoid any potential conflict.
+Thus, we need to take an all-or-nothing approach while reading and writing. In other words, we need to write the database, using ACID transactions. This will ensure (among other guarantees) that if at the time of making a write on the database, if the relevant part of database has progressed further from the last read, the system will fail the transaction to avoid any potential conflict.
 
 ## Running the System
 
@@ -166,19 +173,26 @@ CREATE TABLE bookings (
 To run the system
 
 ```
-PG_USER=postgres PG_DATABASE=meetings PG_PORT=5432 node src/main.js
+npm start
 ```
 
+### Tests
 
+Tests are being run using Jest framework. To run tests locally
+
+```
+npm test
+```
+
+Additionally, there is a GitHub workflow that runs tests on the Main branch.
 
 ## Further Improvements
 
 Here are some improvements that can be introduced to the system:
 
-- 1. Allow for users and rooms to be deleted from the system
-- 2. Provide a way to see the list of rooms where meetings can be scheduled
-- 3. For a given time-slot, display the list of available rooms and available users
-- 4. Ensure that there is at least and only one room for each meeting and there is at least one user for each meeting 
+- Allow for users, rooms and meetings to be deleted from the system
+- Provide a way to see the list of rooms where meetings can be scheduled
+- For a given time-slot, display the list of available rooms and available users
+- Ensure that there is at least and only one room for each meeting and there is at least one user for each meeting 
     - Currently, as the system treats both the users and rooms at the same level, it is possible to schedule meetings involving more than one room or without any room at all
-- 6. Allow for modification of time-slot and/or number of participants of an already scheduled meeting
-- 7. Allow for deletion of an existing meeting.
+- Allow for modification of time-slot and/or number of participants of an already scheduled meeting
