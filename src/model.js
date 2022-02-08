@@ -120,8 +120,6 @@ let to = Math.floor(
   Date.parse(new Date("2022", "01", "15", "12", "00", "11")) / 1000
 );
 
-// console.log(from)
-// console.log(to)
 
 console.log(await insertMeeting(["oO", "Cat"], from, to));
 
