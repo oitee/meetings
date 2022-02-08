@@ -19,9 +19,10 @@ export async function insertEntity(name, entityType) {
   } catch (e) {
     if (e.code === "23505") {
       // See: https://www.postgresql.org/docs/12/errcodes-appendix.html
-      return { status: false, message: `Already exists`, name, entityType };
+      return { status: false, message: `${name} is already taken. Please try again`};
     }
-    return { status: false, message: e.detail, name, entityType };
+    return { status: false, message: `Error while inserting new ${entityType} with name: ${name} 
+  ${e.detail}` };
   } finally {
     client.release();
   }
@@ -63,8 +64,7 @@ export async function insertMeeting(entities, from, to, retry = false) {
 
       return {
         status: false,
-        message: "One or more entities have conflicting schedules",
-        entitiesWithConflict: conflictingEntities.rows.map((row) => row.entity),
+        message: `One or more entities have conflicting schedules: ${conflictingEntities.rows.map((row) => row.entity)}`,
       };
     }
     const meetingId = uuidv4();
@@ -133,6 +133,9 @@ console.log(await insertMeeting(["Oba", "Pea"], from, to));
 //  console.log(await insertMeeting(['Dog'], from, to))
 
 // console.log(await insertMeeting(["Oiti"], from, to))
-//await db.pool.end();
+
 }
 
+export async function poolEnd(){
+  await db.pool.end();
+}

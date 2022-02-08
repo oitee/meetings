@@ -19,6 +19,12 @@ timeSlot1.to = Math.floor(
   Date.parse(new Date("2022", "01", "15", "12", "00", "00")) / 1000
 );
 
+/**
+ * To test: 
+ * a) whether entity1, entity2, entity3 and entity4 can be inserted in the database, and
+ * b) attempts to re-inserting the same entity fail
+ * 
+ */
 async function insertEntities() {
   // Inserting the four entities. This  should be successful
   assert.equal(
@@ -54,6 +60,10 @@ async function insertEntities() {
   );
 }
 
+/**
+ * To test: attempts to schedule meetings with entities for non-overlapping time-slots succeed 
+ * 
+ */
 async function meetingWithoutConflict() {
   // Attempts to schedule a meeting during timeSlot1 should succeed
   assert.equal(
@@ -111,7 +121,10 @@ async function meetingWithoutConflict() {
     "Meeting with entity2 and entity3 for the nonOverLappingTimeSlot should pass"
   );
 }
-
+/**
+ * To test: attempts to schedule meetings with conflicting schedules fail
+ * 
+ */
 async function meetingWithConflict() {
   // In this test, we will try to create a list of over-lapping time-slots which conflict with timeSlot1
 
@@ -220,6 +233,9 @@ async function meetingWithConflict() {
   );
 }
 
+/**
+ * To test attempts to schedule a meeting with entity not present in the DB fail 
+ */
 async function meetingWithUnknownEntity() {
   // entity5 has not been inserted into the databse
   // Attempts to schedule a meeting involving entity5 should fail
