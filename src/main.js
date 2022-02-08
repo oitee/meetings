@@ -1,5 +1,4 @@
 import readline from "readline";
-import * as controller from "./controller.js";
 import * as db from "./db_connection.js";
 import * as model from "./model.js";
 import * as utils from "./utils.js";
@@ -50,7 +49,6 @@ async function enterNewEntity(entity) {
         return start();
       }
       console.log(response.message);
-      console.log(`Please try again`);
       console.log();
       return start();
     })
