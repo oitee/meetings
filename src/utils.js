@@ -25,12 +25,5 @@ export function extractUsers(str){
 }
 
 
-function tests(){
-    console.log(convertDate('23 01 2024 13:11:00'));
-    console.log(convertDate('01 23 2024 13:11:00'));
-    console.log(convertDate('01 02 1999 13:00:58'));
-    console.log(convertDate('01 02 1999 08:00:11'));
-    console.log(convertDate('01 02 1999 13:00:99'));
-}
 
 

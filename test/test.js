@@ -1,6 +1,7 @@
 import assert from "assert";
 import * as db from "../src/db_connection.js";
 import * as model from "../src/model.js";
+import * as utils from "../src/utils.js";
 
 // LIST OF ENTITIES TO BE USED FOR TESTS
 
@@ -20,10 +21,10 @@ timeSlot1.to = Math.floor(
 );
 
 /**
- * To test: 
+ * To test:
  * a) whether entity1, entity2, entity3 and entity4 can be inserted in the database, and
  * b) attempts to re-inserting the same entity fail
- * 
+ *
  */
 async function insertEntities() {
   // Inserting the four entities. This  should be successful
@@ -61,8 +62,8 @@ async function insertEntities() {
 }
 
 /**
- * To test: attempts to schedule meetings with entities for non-overlapping time-slots succeed 
- * 
+ * To test: attempts to schedule meetings with entities for non-overlapping time-slots succeed
+ *
  */
 async function meetingWithoutConflict() {
   // Attempts to schedule a meeting during timeSlot1 should succeed
@@ -123,7 +124,7 @@ async function meetingWithoutConflict() {
 }
 /**
  * To test: attempts to schedule meetings with conflicting schedules fail
- * 
+ *
  */
 async function meetingWithConflict() {
   // In this test, we will try to create a list of over-lapping time-slots which conflict with timeSlot1
@@ -234,7 +235,7 @@ async function meetingWithConflict() {
 }
 
 /**
- * To test attempts to schedule a meeting with entity not present in the DB fail 
+ * To test attempts to schedule a meeting with entity not present in the DB fail
  */
 async function meetingWithUnknownEntity() {
   // entity5 has not been inserted into the databse
@@ -267,6 +268,51 @@ async function meetingWithUnknownEntity() {
     false,
     "Scheduling a meeting involving entity5 and entity1 should fail"
   );
+}
+
+function utilsTest() {
+  // Valid time-stamps
+  assert.ok(utils.convertDate("01 23 2024 13:11:00").status);
+  assert.equal(
+    utils.convertDate("01 23 2024 13:11:00").timeStamp,
+    1705995660000
+  );
+  //! The following test may fail, due to time-zone mis-match
+  assert.equal(
+    utils.convertDate("01 23 2024 13:11:00").stringifiedTimeStamp,
+    "Tue Jan 23 2024 13:11:00 GMT+0530 (India Standard Time)"
+  );
+
+  assert.ok(utils.convertDate("01 02 1999 13:00:58").status);
+  assert.equal(
+    utils.convertDate("01 02 1999 13:00:58").timeStamp,
+    915262258000
+  );
+  //! The following test may fail, due to time-zone mis-match
+  assert.equal(
+    utils.convertDate("01 02 1999 13:00:58").stringifiedTimeStamp,
+    "Sat Jan 02 1999 13:00:58 GMT+0530 (India Standard Time)"
+  );
+
+  assert.ok(utils.convertDate("01 02 1999 08:00:11").status);
+  assert.equal(
+    utils.convertDate("01 02 1999 08:00:11").timeStamp,
+    915244211000
+  );
+
+  //! The following test may fail, due to time-zone mis-match
+  assert.equal(
+    utils.convertDate("01 02 1999 08:00:11").stringifiedTimeStamp,
+    "Sat Jan 02 1999 08:00:11 GMT+0530 (India Standard Time)"
+  );
+
+  //Invalid timestamps
+  assert.equal(utils.convertDate('01 32 1999 12:00:00').status, false)// { status: false, message: 'Invalid Date' }
+    console.log(utils.convertDate('23 01 2024 13:11:00').status, false);// { status: false, message: 'Invalid Date' }
+    console.log(utils.convertDate('23 01 3000 13:11:00').status, false);// { status: false, message: 'Invalid Date' }
+    console.log(utils.convertDate('01 02 1999 13:00:99').status, false);//{ status: false, message: 'Invalid Date' }
+    console.log(utils.convertDate('01 02 1999 12:88:00').status, false); // { status: false, message: 'Invalid Date' }
+    console.log(utils.convertDate('01 02 1999 25:00:00').status, false)// { status: false, message: 'Invalid Date' }
 }
 
 beforeAll(async () => {
@@ -303,3 +349,4 @@ await test(
 );
 await test("Schedule Meetings with conflicts", meetingWithConflict);
 await test("Schedule Meetings with unknown user", meetingWithUnknownEntity);
+test("Utils test", utilsTest);
