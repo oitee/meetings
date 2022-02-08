@@ -107,35 +107,6 @@ export async function insertMeeting(entities, from, to, retry = false) {
 }
 
 
-async function tests(){
-// let res1 = await insertEntity("Cat", "room");
-// console.log(res1);
-// let res2 = await insertEntity("Cat", "room");
-// console.log(res2);
-
-let from = Math.floor(
-  Date.parse(new Date("2022", "01", "15", "11", "00", "11")) / 1000
-);
-let to = Math.floor(
-  Date.parse(new Date("2022", "01", "15", "12", "00", "11")) / 1000
-);
-
-
-console.log(await insertMeeting(["oO", "Cat"], from, to));
-
-console.log(await insertMeeting(["Cat", "Dog"], from, to));
-await insertEntity("Dog", "user");
-await insertEntity("Pea", "user");
-await insertEntity("Q", "user");
-console.log(await insertMeeting(["Pea", "Q"], from, to));
-console.log(await insertMeeting(["Pea", "Dog"], from, to));
-console.log(await insertMeeting(["Oba", "Pea"], from, to));
-//  console.log(await insertMeeting(['Dog'], from, to))
-
-// console.log(await insertMeeting(["Oiti"], from, to))
-
-}
-
 export async function poolEnd(){
   await db.pool.end();
 }

@@ -272,47 +272,17 @@ async function meetingWithUnknownEntity() {
 
 function utilsTest() {
   // Valid time-stamps
-  assert.ok(utils.convertDate("01 23 2024 13:11:00").status);
-  assert.equal(
-    utils.convertDate("01 23 2024 13:11:00").timeStamp,
-    1705995660000
-  );
-  //! The following test may fail, due to time-zone mis-match
-  assert.equal(
-    utils.convertDate("01 23 2024 13:11:00").stringifiedTimeStamp,
-    "Tue Jan 23 2024 13:11:00 GMT+0530 (India Standard Time)"
-  );
-
-  assert.ok(utils.convertDate("01 02 1999 13:00:58").status);
-  assert.equal(
-    utils.convertDate("01 02 1999 13:00:58").timeStamp,
-    915262258000
-  );
-  //! The following test may fail, due to time-zone mis-match
-  assert.equal(
-    utils.convertDate("01 02 1999 13:00:58").stringifiedTimeStamp,
-    "Sat Jan 02 1999 13:00:58 GMT+0530 (India Standard Time)"
-  );
-
-  assert.ok(utils.convertDate("01 02 1999 08:00:11").status);
-  assert.equal(
-    utils.convertDate("01 02 1999 08:00:11").timeStamp,
-    915244211000
-  );
-
-  //! The following test may fail, due to time-zone mis-match
-  assert.equal(
-    utils.convertDate("01 02 1999 08:00:11").stringifiedTimeStamp,
-    "Sat Jan 02 1999 08:00:11 GMT+0530 (India Standard Time)"
-  );
+  assert.equal(utils.convertDate("01 23 2024 13:11:00").status, true);
+  assert.equal(utils.convertDate("01 02 1999 13:00:58").status, true);
+  assert.equal(utils.convertDate("01 02 1999 08:00:11").status, true);
 
   //Invalid timestamps
-  assert.equal(utils.convertDate('01 32 1999 12:00:00').status, false)// { status: false, message: 'Invalid Date' }
-    console.log(utils.convertDate('23 01 2024 13:11:00').status, false);// { status: false, message: 'Invalid Date' }
-    console.log(utils.convertDate('23 01 3000 13:11:00').status, false);// { status: false, message: 'Invalid Date' }
-    console.log(utils.convertDate('01 02 1999 13:00:99').status, false);//{ status: false, message: 'Invalid Date' }
-    console.log(utils.convertDate('01 02 1999 12:88:00').status, false); // { status: false, message: 'Invalid Date' }
-    console.log(utils.convertDate('01 02 1999 25:00:00').status, false)// { status: false, message: 'Invalid Date' }
+  assert.equal(utils.convertDate("01 32 1999 12:00:00").status, false); 
+  assert.equal(utils.convertDate("23 01 2024 13:11:00").status, false);
+  assert.equal(utils.convertDate("23 01 3000 13:11:00").status, false); 
+  assert.equal(utils.convertDate("01 02 1999 13:00:99").status, false); 
+  assert.equal(utils.convertDate("01 02 1999 12:88:00").status, false); 
+  assert.equal(utils.convertDate("01 02 1999 25:00:00").status, false); 
 }
 
 beforeAll(async () => {
