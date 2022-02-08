@@ -14,13 +14,12 @@ async function start() {
   console.log(`If you want to add a new user, enter 'u'
 If you want to add a new room, enter 'r'
 If you want to schedule a new meeting, enter 'm'
-----
+
 To quit, enter 'q'
   `);
 
   rl.question(
-    `>
-`,
+    `> `,
     async (input) => {
       if (input === "q") {
         await model.poolEnd();
@@ -120,6 +119,7 @@ async function scheduleNewMeeting() {
               .insertMeeting(entities, fromTimeStamp, toTimeStamp)
               .then((response) => {
                 if (response.status) {
+                  console.log(`******`)
                   console.log(`Meeting has been successfully scheduled!`);
                   console.log(`Meeting ID: ${response.meetingId}`);
                   console.log(`Meeting to take place at ${room}`);
@@ -130,7 +130,7 @@ async function scheduleNewMeeting() {
                     `The meeting will end at ${toTimeObj.stringifiedTimeStamp}`
                   );
                   console.log(`Participants: ${users}`);
-                  console.log(`......`);
+                  console.log(`******`)
                   console.log();
                   return start();
                 }

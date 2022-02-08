@@ -64,7 +64,7 @@ export async function insertMeeting(entities, from, to, retry = false) {
 
       return {
         status: false,
-        message: `One or more entities have conflicting schedules: ${conflictingEntities.rows.map((row) => row.entity)}`,
+        message: `Following entities have conflicting schedules: ${conflictingEntities.rows.map((row) => row.entity)}`,
       };
     }
     const meetingId = uuidv4();
