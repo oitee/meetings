@@ -1,5 +1,8 @@
 import readline from "readline";
 import * as controller from "./controller.js";
+import * as db from "./db_connection.js"
+
+db.poolStart()
 
 const rl = readline.createInterface({
   input: process.stdin,

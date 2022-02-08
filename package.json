@@ -2,9 +2,10 @@
   "name": "meetings",
   "version": "1.0.0",
   "description": "A Node.js application that schedules meetings for sepcific users in specific rooms",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "PG_USER=postgres PG_DATABASE=meetings PG_PORT=5432 node src/main.js"
   },
   "repository": {
     "type": "git",
@@ -16,9 +17,18 @@
     "url": "https://github.com/oitee/meetings/issues"
   },
   "homepage": "https://github.com/oitee/meetings#readme",
+  "devDependencies": {
+    "jest": "^27.3.1"
+  },
   "type": "module",
   "dependencies": {
     "pg": "^8.7.3",
     "uuid": "^8.3.2"
+  },
+  "jest": {
+    "testMatch": [
+      "**/test/**/**.js"
+    ],
+    "testTimeout": 60000
   }
 }
