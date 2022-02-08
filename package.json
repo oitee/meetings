@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "test": "PG_USER=postgres PG_DATABASE=postgres PG_PORT=5432 NODE_OPTIONS=--experimental-vm-modules jest --coverage=true -i",
-    "start": "PG_USER=postgres PG_DATABASE=meetings PG_PORT=5432 node src/main.js"
+    "start": "PG_USER=postgres PG_DATABASE=meetings PG_PORT=5432 node src/main.js",
+    "test_without_db_connections" : "NODE_OPTIONS=--experimental-vm-modules jest --coverage=true -i"
   },
   "repository": {
     "type": "git",
