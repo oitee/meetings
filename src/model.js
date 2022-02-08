@@ -1,6 +1,10 @@
 import * as db from "./db_connection.js";
 import { v4 as uuidv4 } from "uuid";
 
+if(!db.pool){
+  await db.poolStart();
+}
+
 export async function insertEntity(name, entityType) {
   const client = await db.pool.connect();
 
@@ -102,6 +106,8 @@ export async function insertMeeting(entities, from, to, retry = false) {
   }
 }
 
+
+async function tests(){
 // let res1 = await insertEntity("Cat", "room");
 // console.log(res1);
 // let res2 = await insertEntity("Cat", "room");
@@ -129,4 +135,6 @@ console.log(await insertMeeting(["Oba", "Pea"], from, to));
 //  console.log(await insertMeeting(['Dog'], from, to))
 
 // console.log(await insertMeeting(["Oiti"], from, to))
-await db.pool.end();
+//await db.pool.end();
+}
+
