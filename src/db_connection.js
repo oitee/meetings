@@ -1,8 +1,7 @@
-import pkg from 'pg';
+import pkg from "pg";
 import * as utils from "./utils.js";
 
-
-const {Pool} = pkg;
+const { Pool } = pkg;
 
 const poolConfig = {
   user: utils.PG_USER,
@@ -14,8 +13,8 @@ const poolConfig = {
 
 export let pool;
 
-export function poolStart(){
-  if(!pool || pool.ended){
+export function poolStart() {
+  if (!pool || pool.ended) {
     pool = new Pool(poolConfig);
   }
 }

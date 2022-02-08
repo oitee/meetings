@@ -1,9 +1,7 @@
 import * as db from "./db_connection.js";
 import { v4 as uuidv4 } from "uuid";
 
-if(!db.pool){
-  await db.poolStart();
-}
+
 
 export async function insertEntity(name, entityType) {
   const client = await db.pool.connect();
@@ -19,10 +17,16 @@ export async function insertEntity(name, entityType) {
   } catch (e) {
     if (e.code === "23505") {
       // See: https://www.postgresql.org/docs/12/errcodes-appendix.html
-      return { status: false, message: `${name} is already taken. Please try again`};
+      return {
+        status: false,
+        message: `${name} is already taken. Please try again`,
+      };
     }
-    return { status: false, message: `Error while inserting new ${entityType} with name: ${name} 
-  ${e.detail}` };
+    return {
+      status: false,
+      message: `Error while inserting new ${entityType} with name: ${name} 
+  ${e.detail}`,
+    };
   } finally {
     client.release();
   }
@@ -40,11 +44,6 @@ export async function insertMeeting(entities, from, to, retry = false) {
 
   try {
     await client.query("BEGIN");
-
-    /*
-    SELECT * from bookings WHERE entity = $1 AND from_ts <= from AND to_ts >= from
-    SELECT * from bookings WHERE entity = $1 AND from_ts >= from AND from_ts <= to; 
-    */
 
     const queryText = `
     SELECT entity FROM bookings WHERE 
@@ -64,7 +63,9 @@ export async function insertMeeting(entities, from, to, retry = false) {
 
       return {
         status: false,
-        message: `Following entities have conflicting schedules: ${conflictingEntities.rows.map((row) => row.entity)}`,
+        message: `Following entities have conflicting schedules: ${conflictingEntities.rows.map(
+          (row) => row.entity
+        )}`,
       };
     }
     const meetingId = uuidv4();
@@ -107,6 +108,3 @@ export async function insertMeeting(entities, from, to, retry = false) {
 }
 
 
-export async function poolEnd(){
-  await db.pool.end();
-}
