@@ -30,6 +30,7 @@
     "testMatch": [
       "**/test/**/**.js"
     ],
-    "testTimeout": 60000
+    "testTimeout": 60000,
+    "modulePathIgnorePatterns": ["concurrent_requests.js"]
   }
 }

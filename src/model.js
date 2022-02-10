@@ -43,7 +43,7 @@ export async function insertMeeting(entities, from, to, retry = false) {
   const client = await db.pool.connect();
 
   try {
-    await client.query("BEGIN");
+    await client.query("BEGIN TRANSACTION ISOLATION LEVEL SERIALIZABLE");
 
     const queryText = `
     SELECT entity FROM bookings WHERE 
@@ -52,7 +52,7 @@ export async function insertMeeting(entities, from, to, retry = false) {
             (from_ts <= to_timestamp($2) AND to_ts >= to_timestamp($2))
             OR
             (from_ts >= to_timestamp($2) AND from_ts <= to_timestamp($3))
-        )
+        ) FOR UPDATE 
    `;
 
     const queryParams = [entities, from, to];

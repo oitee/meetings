@@ -2,6 +2,7 @@ import assert from "assert";
 import * as db from "../src/db_connection.js";
 import * as model from "../src/model.js";
 import * as utils from "../src/utils.js";
+import * as concurrent from "./concurrent_requests.js";
 
 // LIST OF ENTITIES TO BE USED FOR TESTS
 
@@ -277,12 +278,12 @@ function utilsTest() {
   assert.equal(utils.convertDate("01 02 1999 08:00:11").status, true);
 
   //Invalid timestamps
-  assert.equal(utils.convertDate("01 32 1999 12:00:00").status, false); 
+  assert.equal(utils.convertDate("01 32 1999 12:00:00").status, false);
   assert.equal(utils.convertDate("23 01 2024 13:11:00").status, false);
-  assert.equal(utils.convertDate("23 01 3000 13:11:00").status, false); 
-  assert.equal(utils.convertDate("01 02 1999 13:00:99").status, false); 
-  assert.equal(utils.convertDate("01 02 1999 12:88:00").status, false); 
-  assert.equal(utils.convertDate("01 02 1999 25:00:00").status, false); 
+  assert.equal(utils.convertDate("23 01 3000 13:11:00").status, false);
+  assert.equal(utils.convertDate("01 02 1999 13:00:99").status, false);
+  assert.equal(utils.convertDate("01 02 1999 12:88:00").status, false);
+  assert.equal(utils.convertDate("01 02 1999 25:00:00").status, false);
 }
 
 beforeAll(async () => {
@@ -312,11 +313,33 @@ afterAll(async () => {
   await db.pool.end();
 });
 
-await test("Insertion of entities", insertEntities);
-await test(
+test("Insertion of entities", insertEntities);
+test(
   "Schedule Meetings without conflicting timestamps",
   meetingWithoutConflict
 );
-await test("Schedule Meetings with conflicts", meetingWithConflict);
-await test("Schedule Meetings with unknown user", meetingWithUnknownEntity);
+test("Schedule Meetings with conflicts", meetingWithConflict);
+test("Schedule Meetings with unknown user", meetingWithUnknownEntity);
 test("Utils test", utilsTest);
+test("Concurrent isolation", async () => {
+  let entityX = `X_${Math.random()}`;
+  await model.insertEntity(entityX, "user");
+  const timeSlotX = {};
+
+  timeSlotX.from = Math.floor(
+    Date.parse(new Date("2021", "11", "15", "11", "00", "00")) / 1000
+  );
+
+  timeSlotX.to = Math.floor(
+    Date.parse(new Date("2021", "11", "15", "13", "00", "00")) / 1000
+  );
+  await concurrent.launchWorkers(entityX, timeSlotX, 20);
+  assert.equal(
+    (
+      await db.pool.query(`SELECT entity FROM bookings where entity=$1`, [
+        entityX,
+      ])
+    ).rows.length,
+    1
+  );
+});
